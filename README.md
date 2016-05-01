@@ -17,3 +17,5 @@ Spring3 MVC + JDBC (MS SQL Server) + JSP
 # Test
 - http://localhost:8080/QueryCat/rest/query/
 - 
+# Reference
+- Developing a Spring Framework MVC application step-by-step :: https://docs.spring.io/docs/Spring-MVC-step-by-step/
