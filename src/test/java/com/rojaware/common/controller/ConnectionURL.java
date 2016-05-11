@@ -11,7 +11,7 @@ public class ConnectionURL
 
 		      // Create a variable for the connection string.
 		      String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=company"
-		      		+ ";user=sa;password=river123";
+		      		+ ";user=rojaware;password=rojaware";
 
 		      // Declare the JDBC objects.
 		      Connection con = null;

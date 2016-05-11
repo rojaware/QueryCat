@@ -15,8 +15,11 @@ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 		<property name="username" value="sa" />
 		<property name="password" value="river123" />
 	</bean>
-	<bean id="queryDAO" class="com.rojaware.query.dao.impl.JdbcQueryDAO">
+	<bean id="queryDAO" class="com.rojaware.query.dao.impl.JdbcQueryDao">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
+	<bean id="queryService" class="com.rojaware.query.service.impl.QueryServiceImpl"></bean>
+		
 	
 </beans>

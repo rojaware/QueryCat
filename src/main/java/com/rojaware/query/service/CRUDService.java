@@ -1,4 +1,4 @@
-package com.rojaware.common.service;
+package com.rojaware.query.service;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.rojaware.common.controller;
+package com.rojaware.query.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;

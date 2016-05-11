@@ -63,7 +63,7 @@ public class Query implements Serializable {
 		this.sql = sql;
 	}
 
-	public Map getMap() {
+	public Map<String, Object> getMap() {
 		return map;
 	}
 
