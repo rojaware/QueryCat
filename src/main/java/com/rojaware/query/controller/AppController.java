@@ -2,7 +2,6 @@ package com.rojaware.query.controller;
 
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.rmi.CORBA.Util;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -30,7 +28,6 @@ import com.google.gson.Gson;
 import com.rojaware.query.exception.ErrorResource;
 import com.rojaware.query.exception.FieldErrorResource;
 import com.rojaware.query.exception.QueryException;
-import com.rojaware.query.model.CsvReportVO;
 import com.rojaware.query.model.Query;
 import com.rojaware.query.model.TableView;
 import com.rojaware.query.service.QueryService;
@@ -190,10 +187,13 @@ public class AppController {
         buildParameters(query);
         queryService.saveQuery(query);
  
-        model.addAttribute("success", "Query :: /n" + query.getName() + "/n"+ query.getSql() + "/n registered successfully");
-        //return "success";
+        model.addAttribute("success", composeSuccessMsg(query));
         return "registrationsuccess";
     }
+
+	private String composeSuccessMsg(Query query) {
+		return "Query :: \n(" + query.getName() + ")\n"+ query.getSql() + "\n registered successfully";
+	}
  
  
     private void buildParameters(Query query) {
@@ -226,18 +226,11 @@ public class AppController {
             return "registration";
         }
  
-        /*//Uncomment below 'if block' if you WANT TO ALLOW UPDATING SSO_ID in UI which is a unique key to a Query.
-        if(!queryService.isQuerySSOUnique(query.getId(), query.getSsoId())){
-            FieldError ssoError =new FieldError("query","ssoId",messageSource.getMessage("non.unique.ssoId", new 
- 
-String[]{query.getSsoId()}, Locale.getDefault()));
-            result.addError(ssoError);
-            return "registration";
-        }*/
+       
  
         queryService.updateQuery(query);
  
-        model.addAttribute("success", "Query " + query.getName() + " "+ query.getSql() + " updated successfully");
+        model.addAttribute("success", composeSuccessMsg(query));
         return "registrationsuccess";
     }
  
