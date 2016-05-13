@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.rojaware.query.dao.QueryDao;
 import com.rojaware.query.exception.QueryException;
+import com.rojaware.query.model.CsvReportVO;
 import com.rojaware.query.model.Query;
 import com.rojaware.query.model.TableView;
 import com.rojaware.query.service.QueryService;
@@ -78,11 +79,26 @@ public class QueryServiceImpl implements QueryService {
 		try {
 			list = dao.execute(query);
 		} catch (SQLException e) {
-			throw new QueryException(e.getMessage(), e);
+			String msg = e.getMessage() + " :: " + e.getErrorCode();
+			throw new QueryException(e.getSQLState() + " :: " + msg, e);
 		}
 		TableView view = new TableView(list);
 		LOG.info("result :: " +view.toString());
 		return view;
+	}
+
+	@Override
+	public CsvReportVO getReport(String sql) {
+		
+		List<List<Object>> data = dao.getReport(sql);
+		// TODO convert it to VO 
+		return null;
+	}
+
+	@Override
+	public void getReport(TableView view) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

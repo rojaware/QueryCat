@@ -47,7 +47,7 @@ public class TestQueryDao
     }
     
     @Test
-    public void execute(){
+    public void execute() throws QueryException{
     	Query query = new Query();
     	query.setId(1001);
     	Map<String, Object> map = new HashMap<String, Object>();
@@ -56,12 +56,9 @@ public class TestQueryDao
     	List<List<String>> list=null;
 		try {
 			list = dao.execute(query);
-		} catch (QueryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String msg = e.getMessage() + " :: " + e.getErrorCode();
+			throw new QueryException(e.getSQLState() + " :: " + msg, e);
 		}
     	Gson gson = new Gson();
     	String s = gson.toJson(list);

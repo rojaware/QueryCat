@@ -11,8 +11,12 @@ INSERT INTO "company"."dbo"."ACCOUNT" (PRODUCT_NAME,CLIENT_ID,BALANCE) VALUES ('
 INSERT INTO "company"."dbo"."ACCOUNT" (PRODUCT_NAME,CLIENT_ID,BALANCE) VALUES ('RRSP      ',3,10030.0000);
 
 -- RESET QUERY TABLE WITH PRIMARY KEY
+
 DELETE FROM QUERY;
-dbcc checkident (query, reseed, 0);
+DBCC CHECKIDENT ('QUERY', RESEED, 0);
+INSERT INTO QUERY (name,sql,map) VALUES ('SELECT DB_NAME()','SELECT * FROM ACCOUNT WHERE BALANCE < 1000',null);
+INSERT INTO QUERY (name,sql,map) VALUES ('rufina test','select * from address where city = ''toronto''',null);
+INSERT INTO QUERY (name,sql,map) VALUES ('area check',' select * from client c inner join account a on c.client_id = a.client_id where a.PRODUCT_NAME = ''check''',null);
+INSERT INTO QUERY (name,sql,map) VALUES ('bounce test','SELECT * FROM ACCOUNT WHERE BALANCE > {BALANCE} AND PRODUCT_NAME LIKE ''%{PRODUCT}%''','{"BALANCE":"","PRODUCT":""}');
 
-
-select * from query;
+select * from query

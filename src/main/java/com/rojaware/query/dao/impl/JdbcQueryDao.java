@@ -175,29 +175,29 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 		if (query == null) {
 			throw new QueryException("Query is empty");
 		}
-		String sql = null;
+		
 		if (query.getSql() == null) {
 			Query dbQuery = this.findById(query.getId());
-		    sql = dbQuery.getSql();
-			// add params
-			Map<String, Object> params = query.getMap();
-			if (params != null) {
-				
-				// SELECT * FROM ACCOUNT WHERE BALANCE > {BALANCE} AND PRODUCT LIKE '%{PRODUCT}%'
-				 for (Map.Entry<String, Object> entry : params.entrySet()) {
-				        String key = entry.getKey();
-				        String argument = "{"+key+"}";
-				        Object value = entry.getValue();
-				        
-				        if (sql.contains(argument)) {
-							sql = sql.replace(argument, (String)value);
-							LOG.info("Replaced SQL :: " + sql);
-						} else {
-							throw new QueryException("No matching text found by " + argument);
-						}
-				    }
-			}
-			
+		    query.setSql(dbQuery.getSql());
+		}
+		
+		// add parameterized value into SQL if map exists
+		Map<String, Object> params = query.getMap();
+		if (params != null && params.size() >0) {
+			// SELECT * FROM ACCOUNT WHERE BALANCE > {BALANCE} AND PRODUCT LIKE '%{PRODUCT}%'
+			String sql = query.getSql();
+			for (Map.Entry<String, Object> entry : params.entrySet()) {
+		        String key = entry.getKey();
+		        String argument = "{"+key+"}";
+		        Object value = entry.getValue();
+		        
+		        if (sql.contains(argument)) {
+					sql = sql.replace(argument, (String)value);
+					LOG.info("Replaced SQL :: " + sql);
+				} else {
+					throw new QueryException("No matching text found by " + argument);
+				}
+		    }
 			query.setSql(sql);
 		}
 		return getJdbcTemplate().query(query.getSql(), new ResultSetExtractor<List<List<String>>>() {
@@ -279,5 +279,38 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 		LOG.debug("DELETING :: "+ id);
 		deleteById("DELETE FROM QUERY WHERE id=?", id);
 	}
+	@Override
+	public List<List<Object>> getReport(String sql) {
 
+		return getJdbcTemplate().query(sql, new ResultSetExtractor<List<List<Object>>>(){
+			public List<List<Object>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+				List<List<Object>> data = new ArrayList<List<Object>>();
+				List<Object> labels = new ArrayList<Object>();
+				List<Object> types = new ArrayList<Object>();
+
+
+				ResultSetMetaData md = rs.getMetaData();
+
+				for(int c=1; c<= md.getColumnCount();c++){
+					labels.add(md.getColumnName(c));
+					types.add(md.getColumnTypeName(c));
+				}
+				data.add(labels);
+				data.add(types);
+
+				while(rs.next()){
+					List<Object> values = new ArrayList<Object>();
+
+					for(Object label: labels){
+						int colpos = labels.lastIndexOf(label);
+						values.add(rs.getObject(colpos+1));
+					}
+					data.add(values);
+				}
+
+				return data;
+			}
+		});
+	}
 }

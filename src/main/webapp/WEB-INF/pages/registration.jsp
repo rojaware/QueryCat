@@ -35,7 +35,9 @@
             <div class="form-group col-md-12">
                 <label class="col-md-3 control-lable" for="sql">SQL</label>
                 <div class="col-md-7">
-                    <form:input type="text" path="sql" id="sql" class="form-control input-sm" />
+                    <form:textarea path="sql" rows="5" cols="30" id="sql"
+							class="form-control input-sm" />
+							
                     <div class="has-error">
                         <form:errors path="sql" class="help-inline"/>
                     </div>

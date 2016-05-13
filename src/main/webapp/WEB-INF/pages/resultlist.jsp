@@ -12,12 +12,19 @@
 </head>
 
 <body>
-	<div class="generic-container">
+	<div class="w3-container w3-green">
 		<div class="panel panel-default">
 			<!-- Default panel contents -->
 			<div class="panel-heading">
-				<img src="<c:url value="/static/images/cat.jpg" />" /><span
-					class="lead">List of Query </span>
+			
+				<a href="<c:url value='/rest/downloadCSV' />"
+					class="btn btn-info btn-lg"> <span
+					class="glyphicon glyphicon-download-alt"></span> CSV</a>
+				<span class="lead"> ${query.name} </span> 
+			    <span class="pull-right">
+				    <a href="<c:url value='/rest/list' />" class="btn btn-info btn-lg">
+					<span class="glyphicon glyphicon-home"></span></a>
+				</span>
 			</div>
 			<table class="table table-hover">
 				<thead>
@@ -38,9 +45,11 @@
 				</tbody>
 			</table>
 		</div>
-		<span class="well floatRight"> Go to <a
-			href="<c:url value='/rest/list' />">Query List</a>
+		<span class="pull-right">
+		    <a href="<c:url value='/rest/list' />" class="btn btn-info btn-lg">
+			<span class="glyphicon glyphicon-home"></span></a>
 		</span>
 	</div>
+	<img src="<c:url value="/static/images/cat.jpg" />" />
 </body>
 </html>

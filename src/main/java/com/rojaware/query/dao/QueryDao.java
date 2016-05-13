@@ -24,6 +24,6 @@ public interface QueryDao {
 	public int findTotalQuery();
 	void insert(Query query);
 	void save(Query query);
-
+    List<List<Object>> getReport(String sql);
 	void deleteById(int id);
 }

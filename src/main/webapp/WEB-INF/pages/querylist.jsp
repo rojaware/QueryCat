@@ -11,25 +11,30 @@
 </head>
 
 <body>
-	<div class="generic-container">
+	<div class="w3-container w3-green">
 		<div class="panel panel-default">
 			<!-- Default panel contents -->
 			<div class="panel-heading">
-				<img src="<c:url value="/static/images/cat.jpg" />" /><span
+				<span
 					class="lead">List of Query </span>
+					<img src="<c:url value="/static/images/cat.png" />" />
 			</div>
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th>No</th>
 						<th>Name</th>
-						<th>SQL</th>
+						
 						<th><a href="<c:url value='/rest/newquery' />"
 							class="btn btn-info btn-sm"> <span
-								class="glyphicon glyphicon-plus"></span> New
+								class="glyphicon glyphicon-plus"></span> 
+						</a>
+						<a href="<c:url value='/rest/newquery' />"
+							class="btn btn-info btn-sm"> <span
+								class="glyphicon glyphicon-cog"></span> 
 						</a></th>
-						<th width="100"></th>
-						<th width="100"></th>
+						
+						
 					</tr>
 				</thead>
 				<tbody>
@@ -37,14 +42,13 @@
 						<tr>
 							<td>${query.id}</td>
 							<td>${query.name}</td>
-							<td>${query.sql}</td>
 							
 							<td><a href="<c:url value='/rest/edit-query-${query.id}' />" >
 								<span class="glyphicon glyphicon-pencil"></span></a> 
 							<a href="<c:url value='/rest/delete-query-${query.id}' />" > 
-								<span class="glyphicon glyphicon-trash"></span>Delete</a> 
+								<span class="glyphicon glyphicon-trash"></span></a> 
 							<a href="<c:url value='/rest/run-query-${query.id}' />" >
-								<span class="glyphicon glyphicon-play"></span>Run</a></td>
+								<span class="glyphicon glyphicon-play"></span></a></td>
 
 						</tr>
 					</c:forEach>
