@@ -1,0 +1,5 @@
+!!com.rojaware.query.config.Configuration
+active: company
+databases: [petr_dev, company]
+released: 2016-05-19T00:00:00Z
+version: '1.11'

@@ -1,0 +1,32 @@
+version: 1.11
+released: 2016-05-19
+
+# target database
+active: petr_dev
+
+
+# database selection - 
+databases:
+   - petr_dev
+   - petr_sit
+   - petr_pat
+   - petr_prod
+   - gdtportaldev
+   - gdtportalsit
+   - gdtportalbat
+   - gdtportaltrn
+   - gdtportaleit
+   - venom_dev
+   - venom_pat
+   - company
+
+# todo list for this application
+todos:
+   - Handling multiple data bases dynamically - Gold Tier, PETR or low environments
+   - SQL deployment for Gold Tier and PETR lower environment by modifying and reading script file
+   - Enhancing to TD Classical UI layout
+   - Role based activities - Admin, Operator as per role tables on each target application
+   - Upgrading to AngularJS Frontend from JSTL Spring MVC
+   - Single Sign-on Login with TD contacts
+   - Adding User Management Feature- ADD, UPDATE, DELETE User for application
+

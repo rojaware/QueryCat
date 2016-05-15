@@ -25,5 +25,5 @@ public interface QueryService {
 
 	List<Map<String, Object>> run(Query query);
 
-	void getReport(TableView view);
+	void changeDataSource(String db);
 }

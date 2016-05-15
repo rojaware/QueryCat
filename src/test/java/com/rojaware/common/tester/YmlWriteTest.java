@@ -6,25 +6,23 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.rojaware.query.config.ConfigManager;
 import com.rojaware.query.config.Configuration;
 
-public class App 
+public class YmlWriteTest 
 {
     public static void main( String[] args )
     {
     	Configuration config = ConfigManager.instance().getConfig();
     	System.out.println("s : "+ config.getActive());
 //    	System.out.println("list : "+ StringUtils.split(config.getDatabases(), ","));
-    	if (App.isDouble("100.00"))
-    		System.out.println("double");
-    	else
-    		System.out.println("integer");
+    	YmlWriteTest.update("company");
+    	
     	
     }
-    public static boolean isDouble(String s)
+    public static void update(String s)
     {
-		if (NumberUtils.isParsable(s) && s.contains(".")) {
-			double d = Double.parseDouble(s);
-			return d != (int) d;
-		}
-		return false;
+    	Configuration config = ConfigManager.instance().getConfig();
+    	config.setActive(s);
+    	
+    	ConfigManager.instance().save();
+    	System.out.println("s : "+ config.getActive());
     }
 }

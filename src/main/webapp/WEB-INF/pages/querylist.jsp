@@ -29,7 +29,7 @@
 							class="btn btn-info btn-sm"> <span
 								class="glyphicon glyphicon-plus"></span> 
 						</a>
-						<a href="<c:url value='/rest/newquery' />"
+						<a href="<c:url value='/rest/todo-list' />"
 							class="btn btn-info btn-sm"> <span
 								class="glyphicon glyphicon-cog"></span> 
 						</a></th>

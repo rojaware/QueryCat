@@ -15,9 +15,10 @@
         ${success}
     </div>
      
-    <span class="well floatRight">
-        Go to <a href="<c:url value='/rest/list' />" >Query List</a>
-    </span>
+   		<span class="pull-right">
+		    <a href="<c:url value='/rest/list' />" class="btn btn-info btn-lg">
+			<span class="glyphicon glyphicon-home"></span></a>
+		</span>
 </div>
 </body>
  

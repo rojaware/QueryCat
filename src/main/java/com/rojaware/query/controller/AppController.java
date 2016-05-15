@@ -15,7 +15,9 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,11 +25,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
+import com.rojaware.query.config.ConfigManager;
 import com.rojaware.query.exception.ErrorResource;
 import com.rojaware.query.exception.FieldErrorResource;
 import com.rojaware.query.exception.QueryException;
+import com.rojaware.query.model.EnvBean;
 import com.rojaware.query.model.Query;
 import com.rojaware.query.model.TableView;
 import com.rojaware.query.service.QueryService;
@@ -190,7 +195,7 @@ public class AppController {
         model.addAttribute("success", composeSuccessMsg(query));
         return "registrationsuccess";
     }
-
+   
 	private String composeSuccessMsg(Query query) {
 		return "Query :: \n(" + query.getName() + ")\n"+ query.getSql() + "\n registered successfully";
 	}
@@ -285,4 +290,32 @@ public class AppController {
 		response.getOutputStream().flush();
 		
 	}
+    @RequestMapping(value = "/todo-list", method = RequestMethod.GET)
+	public ModelAndView todoList() {
+
+		List<String> slist = ConfigManager.instance().getConfig().getTodos();
+		LOG.info("" + StringUtils.join(slist, ','));
+		//return back to index.jsp
+		ModelAndView model = new ModelAndView("setting");
+		model.addObject("envBean", new EnvBean("dev"));
+		model.addObject("databaseList", ConfigManager.instance().getConfig().getDatabases());
+		model.addObject("todoList", slist);
+
+		return model;
+
+	}
+
+   
+	 
+	 @RequestMapping(value = "/env", method = RequestMethod.POST) 
+	    public String env(@ModelAttribute EnvBean envBean, 
+	    		Model model) {
+	        String db = envBean.getEnv();
+	        LOG.info("set data source..." + db);
+			queryService.changeDataSource(db);
+		
+			
+			model.addAttribute("success", "Target Database has been changed to "+db);
+			return "registrationsuccess";
+	    }
 }

@@ -1,25 +1,48 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<!--  <bean id="dataSourceMySql" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/mkyongjava" />
-		<property name="username" value="root" />
-		<property name="password" value="password" />
-	</bean>-->
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
-		<property name="url" value="jdbc:sqlserver://localhost:1433;databaseName=company" />
-		<property name="username" value="sa" />
-		<property name="password" value="river123" />
+	
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+
+		<property name="location">
+			<value>classpath:database.properties</value>
+		</property>
 	</bean>
+	<bean id="parentDataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		abstract="true">
+		<property name="driverClassName" value="${jdbc.driverClassName.dev}" />
+
+	</bean>
+	<bean id="devDataSource" parent="parentDataSource">
+
+		<property name="url" value="${jdbc.url.dev}" />
+		<property name="username" value="${jdbc.username.dev}" />
+		<property name="password" value="${jdbc.password.dev}" />
+	</bean>
+	<bean id="localDataSource" parent="parentDataSource">
+		<property name="url" value="${jdbc.url.local}" />
+		<property name="username" value="${jdbc.username.local}" />
+		<property name="password" value="${jdbc.password.local}" />
+	</bean>
+	<bean id="dataSource" class="com.rojaware.query.dao.impl.MyRoutingDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="petr_dev" value-ref="devDataSource" />
+				<entry key="company" value-ref="localDataSource" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="localDataSource" />
+		<!-- <property name="defaultTargetDataSource" ref="concreteDataSourceOne"/> -->
+	</bean>
+
 	<bean id="queryDAO" class="com.rojaware.query.dao.impl.JdbcQueryDao">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
+
 	<bean id="queryService" class="com.rojaware.query.service.impl.QueryServiceImpl"></bean>
-		
-	
+
 </beans>

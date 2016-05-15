@@ -6,9 +6,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.rojaware.query.dao.QueryDao;
+import com.rojaware.query.dao.impl.DBContextHolder;
 import com.rojaware.query.exception.QueryException;
 import com.rojaware.query.model.Query;
 import com.rojaware.query.model.TableView;
@@ -17,7 +19,8 @@ import com.rojaware.query.service.QueryService;
 @Service ("queryService")
 public class QueryServiceImpl implements QueryService {
 	final static Logger LOG = Logger.getLogger(QueryServiceImpl.class);
-	
+	@Autowired
+	private ApplicationContext appContext;
 	@Autowired
 	QueryDao dao;
 
@@ -86,10 +89,14 @@ public class QueryServiceImpl implements QueryService {
 		return view;
 	}
 
+	
+
 	@Override
-	public void getReport(TableView view) {
-		// TODO Auto-generated method stub
+	public void changeDataSource(String db) {
+		
+		LOG.debug("change database into :: " +db);
+		DBContextHolder.setCatelog(db);
 		
 	}
-
+	
 }
