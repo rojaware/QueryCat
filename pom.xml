@@ -16,7 +16,13 @@
 		<logback.version>1.0.13</logback.version>
 		<slf4j.version>1.7.5</slf4j.version>
 	</properties>
-
+	<repositories>
+		<!-- Repository for ORACLE JDBC Driver -->
+		<repository>
+			<id>codelds</id>
+			<url>https://code.lds.org/nexus/content/groups/main-repo</url>
+		</repository>
+	</repositories>
 	<dependencies>
 
 		<!-- Spring 3 dependencies -->
@@ -70,6 +76,12 @@
 			<artifactId>sqljdbc4</artifactId>
 			<version>4.0</version>
 		</dependency>
+		<!-- Oracle JDBC driver -->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+        </dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -118,12 +130,12 @@
 			<version>1.11</version>
 		</dependency>
 		<!-- http://mvnrepository.com/artifact/com.esotericsoftware.yamlbeans/yamlbeans -->
-<!-- <dependency> -->
-<!--     <groupId>com.esotericsoftware.yamlbeans</groupId> -->
-<!--     <artifactId>yamlbeans</artifactId> -->
-<!--     <version>1.09</version> -->
-<!-- </dependency> -->
-		
+		<!-- <dependency> -->
+		<!-- <groupId>com.esotericsoftware.yamlbeans</groupId> -->
+		<!-- <artifactId>yamlbeans</artifactId> -->
+		<!-- <version>1.09</version> -->
+		<!-- </dependency> -->
+
 		<!-- http://mvnrepository.com/artifact/org.apache.commons/commons-io -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
