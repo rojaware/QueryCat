@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -56,17 +56,28 @@ public class AppController {
      * This method will list all existing querys.
      */
     @RequestMapping(value = { "/", "/list" }, method = RequestMethod.GET)
-    public String listQuerys(ModelMap model) {
- 
-    	List<Query> queryList = queryService.findAllQuerys();
+    public String listQuerys(ModelMap model, HttpSession session) {
+    	String db = obtainTargetDBName(session);
+    	List<Query> queryList = queryService.list(db); 
+//    	List<Query> queryList = queryService.findAllQuerys();
         LOG.info(""+ queryList.toString());
         model.addAttribute("queryList", queryList);
+        model.addAttribute("active", queryService.getActiveDataSource());
         return "querylist";
     }
+
+	private String obtainTargetDBName(HttpSession session) {
+		String db = (String)session.getAttribute("env");
+		if (db == null) {
+			db = ConfigManager.instance().getConfig().getActive();
+		}
+		return db;
+	}
     
     @RequestMapping(value = "/run-query-{id}", method = RequestMethod.GET)
-	public String run(@PathVariable Integer id, ModelMap model) {
-		Query query = queryService.findById(id);
+	public String run(@PathVariable Integer id, ModelMap model, HttpSession session) {
+    	String db = obtainTargetDBName(session);
+		Query query = queryService.findById(id, db);
 		LOG.debug("run before or without parameters...");
 		String message = null;
 		ErrorResource er = new ErrorResource();	
@@ -97,8 +108,10 @@ public class AppController {
 	}
    
     @RequestMapping(value = "/run-query-{id}", method = RequestMethod.POST)
-   	public String run(@Valid Query query, BindingResult result, ModelMap model) {
+   	public String run(@Valid Query query, BindingResult result, ModelMap model, HttpSession session) {
    		LOG.debug("run with parameters...");
+   		String db = obtainTargetDBName(session);
+   		query.setDb(db);
    		String message = null;
    		ErrorResource er = new ErrorResource();	
    		// IF query from database has parameter map, display parameter inputs
@@ -168,7 +181,8 @@ public class AppController {
      * saving query in database. It also validates the query input
      */
     @RequestMapping(value = { "/newquery" }, method = RequestMethod.POST)
-    public String saveQuery(@Valid Query query, BindingResult result, ModelMap model) {
+    public String saveQuery(@Valid Query query, BindingResult result, ModelMap model, HttpSession session) {
+    	String db = obtainTargetDBName(session);
     	LOG.debug("save new input");
         if (result.hasErrors()) {
             return "registration";
@@ -182,7 +196,7 @@ public class AppController {
          * framework as well while still using internationalized messages.
          * 
          */
-        if(!queryService.isQueryUnique( query.getId(), query.getName())){
+        if(!queryService.isQueryUnique( query)){
 //            FieldError ssoError =new FieldError("query","ssoId",messageSource.getMessage("non.unique.ssoId",
 //            		new String[]{query.getName()}, Locale.getDefault()));
 //            result.addError(ssoError);
@@ -190,6 +204,7 @@ public class AppController {
         }
         // build parameter map from SQL
         buildParameters(query);
+        query.setDb(db);
         queryService.saveQuery(query);
  
         model.addAttribute("success", composeSuccessMsg(query));
@@ -197,7 +212,7 @@ public class AppController {
     }
    
 	private String composeSuccessMsg(Query query) {
-		return "Query :: \n(" + query.getName() + ")\n"+ query.getSql() + "\n registered successfully";
+		return "Query :: \n(" + query.toString()+ "\n registered successfully";
 	}
  
  
@@ -212,8 +227,9 @@ public class AppController {
      * This method will provide the medium to update an existing query.
      */
     @RequestMapping(value = { "/edit-query-{id}" }, method = RequestMethod.GET)
-    public String editQuery(@PathVariable("id") Integer id, ModelMap model) {
-        Query query = queryService.findById(id);
+    public String editQuery(@PathVariable("id") Integer id, ModelMap model, HttpSession session) {
+    	String db = this.obtainTargetDBName(session);
+        Query query = queryService.findById(id, db);
         model.addAttribute("query", query);
         model.addAttribute("edit", true);
         return "registration";
@@ -225,14 +241,14 @@ public class AppController {
      */
     @RequestMapping(value = { "/edit-query-{id}" }, method = RequestMethod.POST)
     public String updateQuery(@Valid Query query, BindingResult result,
-            ModelMap model, @PathVariable("id") Integer id) {
- 
+            ModelMap model, @PathVariable("id") Integer id,  HttpSession session) {
+    	String db = this.obtainTargetDBName(session);
         if (result.hasErrors()) {
             return "registration";
         }
  
        
- 
+        query.setDb(db);
         queryService.updateQuery(query);
  
         model.addAttribute("success", composeSuccessMsg(query));
@@ -244,9 +260,10 @@ public class AppController {
      * This method will delete an query by it's id value.
      */
     @RequestMapping(value = { "/delete-query-{id}" }, method = RequestMethod.GET)
-    public String deleteQuery(@PathVariable("id") Integer id) {
+    public String deleteQuery(@PathVariable("id") Integer id,  HttpSession session) {
     	LOG.debug("DELETING");
-        queryService.deleteQueryById(id);
+    	String db = this.obtainTargetDBName(session);
+        queryService.deleteQueryById(id, db);
         return "redirect:/rest/list";
     }
     
@@ -308,13 +325,13 @@ public class AppController {
    
 	 
 	 @RequestMapping(value = "/env", method = RequestMethod.POST) 
-	    public String env(@ModelAttribute EnvBean envBean, 
-	    		Model model) {
+	    public String changeDataSource(@ModelAttribute EnvBean envBean, 
+	    		Model model, HttpSession session) {
 	        String db = envBean.getEnv();
 	        LOG.info("set data source..." + db);
-			queryService.changeDataSource(db);
-		
-			
+	        queryService.changeDataSource(db);
+	        session.setAttribute("env" , db);
+	        
 			model.addAttribute("success", "Target Database has been changed to "+db);
 			return "registrationsuccess";
 	    }

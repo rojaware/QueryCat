@@ -17,13 +17,16 @@ public interface QueryDao {
 	public List<List<String>> execute(Query query) throws QueryException, SQLException;
 	public String runToJson(Query query);
 
-	public Query findById(int id);
+	 Query findById(int id, String db);
+	List<Query> list(String db);
+	
 
-	public List<Query> list();
-
-	public int findTotalQuery();
+	public int findTotalQuery(String db);
 	void insert(Query query);
 	void save(Query query);
-    List<List<Object>> getReport(String sql);
-	void deleteById(int id);
+    List<List<Object>> getReport(String sql, String db);
+	void deleteById(int id, String db);
+	
+    void changeEnv(String env);
+    String getActiveEnv();
 }

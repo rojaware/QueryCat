@@ -1,5 +1,6 @@
 package com.rojaware.query.dao.impl;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -41,10 +42,12 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 	private void initialize() {
 		setDataSource(dataSource);
 	}
+	
+	
 	DecimalFormat dFormat = new DecimalFormat("####,###,###.00");
 	// insert example
 	public void insert(Query query) {
-
+		this.changeEnv(query.getDb());
 		String sql = "INSERT INTO QUERY " + "(NAME, SQL, MAP) VALUES (?, ?, ?)";
 
 		getJdbcTemplate().update(sql, new Object[] { query.getName(), query.getSql(), query.getMapJson() });
@@ -53,7 +56,8 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 
 	// insert batch example
 	public void insertBatch(final List<Query> querys) {
-
+		Query q =querys.get(0);
+		this.changeEnv(q.getDb());
 		String sql = "INSERT INTO QUERY " + "(NAME, SQL, MAP) VALUES (?, ?, ?)";
 
 		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
@@ -74,43 +78,40 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 	}
 
 	// insert batch example with SQL
-	public void insertBatchSQL(final String sql) {
+	public void insertBatchSQL(final String sql, String db) {
 
 		getJdbcTemplate().batchUpdate(new String[] { sql });
 
 	}
+	public Query findById(int id, String db) {
+		   changeEnv(db);
+		   String sql = "SELECT * FROM QUERY WHERE ID = ?";
 
-	// query single row with RowMapper
-	public Query findById(int id) {
-
-		String sql = "SELECT * FROM QUERY WHERE ID = ?";
-
-		try {
-			Query query = (Query) getJdbcTemplate().queryForObject(sql, new Object[] { id }, new QueryRowMapper());
-
-			return query;
-		} catch (EmptyResultDataAccessException e) {
-			return null;
+			try {
+				Query query = (Query) getJdbcTemplate().queryForObject(sql, new Object[] { id }, new QueryRowMapper());
+				query.setDb(db);
+				return query;
+			} catch (EmptyResultDataAccessException e) {
+				return null;
+			}
 		}
-	}
-
-	// query single row with BeanPropertyRowMapper (Query.class)
-	public Query findByQueryId2(int id) {
-
-		String sql = "SELECT * FROM QUERY WHERE ID = ?";
+	
+	public Query findByQueryId2(int id, String db) {
+	   changeEnv(db);
+	   String sql = "SELECT * FROM QUERY WHERE ID = ?";
 
 		try {
 			Query query = (Query) getJdbcTemplate().queryForObject(sql, new Object[] { id },
 					new BeanPropertyRowMapper(Query.class));
+			query.setDb(db);
 			return query;
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
 	}
-
-	// query mutiple rows with manual mapping
-	public List<Query> list() {
-
+	
+	public List<Query> list(String db) {
+		changeEnv(db);
 		String sql = "SELECT * FROM QUERY";
 
 		List<Query> querys = new ArrayList<Query>();
@@ -118,28 +119,41 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 		List<Map<String, Object>> rows = getJdbcTemplate().queryForList(sql);
 		for (Map<String, Object> row : rows) {
 			Query query = new Query();
-			query.setId((Integer) row.get("ID"));
+			
+			Object obj = row.get("ID");
+			int id = 0;
+			if (obj instanceof BigDecimal) {
+				id = ((BigDecimal)obj).intValue();
+			} else {
+				id = (Integer)obj;
+			}
+			query.setId((Integer) id);
 			query.setName((String) row.get("NAME"));
 			query.setSql((String) row.get("SQL"));
 			query.setMap((String) row.get("MAP"));
+			query.setDb(db);
 			querys.add(query);
 		}
 
 		return querys;
 	}
+	
 
 	// query mutiple rows with  (Query.class)
-	public List<Query> findAll2() {
-
+	public List<Query> findAll2(String db) {
+		this.changeEnv(db);
 		String sql = "SELECT * FROM QUERY";
 
 		List<Query> querys = getJdbcTemplate().query(sql, new QueryRowMapper());
+		for (Query q : querys) {
+			q.setDb(db);
+		}
 		
 		return querys;
 	}
 
-	public String findQueryNameById(int id) {
-
+	public String findQueryNameById(int id, String db) {
+		this.changeEnv(db);
 		String sql = "SELECT NAME FROM QUERY WHERE ID = ?";
 		try {
 			String name = (String) getJdbcTemplate().queryForObject(sql, new Object[] { id }, String.class);
@@ -150,18 +164,20 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 		}
 	}
 
-	public int findTotalQuery() {
+	public int findTotalQuery(String db) {
+		this.changeEnv(db);
 		String sql = "SELECT COUNT(*) FROM QUERY";
 		return getJdbcTemplate().queryForInt(sql);
 	}
 
-	public void deleteById(String sql, int id) {
+	public void deleteById(String sql, int id, String db) {
+		this.changeEnv(db);
 		getJdbcTemplate().update(sql, id);
 	}
 
 	@Override
 	public List<Map<String, Object>> run(Query query) {
-
+		changeEnv(query.getDb());
 		Map<String, Object> paramMap = query.getMap();
 		if (paramMap == null) {
 			return getJdbcTemplate().queryForList(query.getSql());
@@ -171,13 +187,13 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 	}
 	@Override
 	public List<List<String>> execute(Query query) throws QueryException, SQLException {
-
+		changeEnv(query.getDb());
 		if (query == null) {
 			throw new QueryException("Query is empty");
 		}
 		
 		if (query.getSql() == null) {
-			Query dbQuery = this.findById(query.getId());
+			Query dbQuery = this.findById(query.getId(), query.getDb());
 		    query.setSql(dbQuery.getSql());
 		}
 		
@@ -261,6 +277,7 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 
 	@Override
 	public void save(Query query) {
+		changeEnv(query.getDb());
 		Integer id = query.getId();
 		if (id == 0) {
 			insert(query);
@@ -275,13 +292,14 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 				new Object[] { query.getName(), query.getSql(), query.getMapJson(), query.getId() });
 	}
 	@Override
-	public void deleteById(int id) {
+	public void deleteById(int id, String db) {
+		changeEnv(db);
 		LOG.debug("DELETING :: "+ id);
-		deleteById("DELETE FROM QUERY WHERE id=?", id);
+		deleteById("DELETE FROM QUERY WHERE id=?", id, db);
 	}
 	@Override
-	public List<List<Object>> getReport(String sql) {
-
+	public List<List<Object>> getReport(String sql, String db) {
+		changeEnv(db);
 		return getJdbcTemplate().query(sql, new ResultSetExtractor<List<List<Object>>>(){
 			public List<List<Object>> extractData(ResultSet rs) throws SQLException, DataAccessException {
 
@@ -312,5 +330,18 @@ public class JdbcQueryDao extends JdbcDaoSupport implements QueryDao {
 				return data;
 			}
 		});
+	}
+
+	@Override
+	public void changeEnv(String env) {
+		MyRoutingDataSource myDataSource = (MyRoutingDataSource)dataSource;
+		myDataSource.setEnv(env);
+		setDataSource(dataSource);
+	}
+
+	@Override
+	public String getActiveEnv() {
+		MyRoutingDataSource myDataSource = (MyRoutingDataSource)dataSource;
+		return myDataSource.getEnv();
 	}
 }

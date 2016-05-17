@@ -1,5 +1,9 @@
 # QueryCat :: Spring3MVC-JSP-Dao-SQL Server
 Spring3 MVC + JDBC (MS SQL Server) + JSP
+How to provide cross database views per single session
+When user select target db, the value should keep alive during session until user changes to other db. 
+the db env value from controller should be be retained to dao layer. The dbContextHolder for env should be maintained within session. Or HttpSession should be called from DBContextHolder. How to access Session from 
+DBContext?
 
 # Database Installation
 - Require MS SQL Express local installation

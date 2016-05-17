@@ -38,7 +38,7 @@ public class TestQueryDao
        
          
         dao.insert(query);
-        List<Query> querys = dao.list();
+        List<Query> querys = dao.list("company");
          
         int size = querys.size();
 //		Assert.assertEquals(7, size);

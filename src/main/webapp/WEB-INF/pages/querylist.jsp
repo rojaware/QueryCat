@@ -16,7 +16,7 @@
 			<!-- Default panel contents -->
 			<div class="panel-heading">
 				<span
-					class="lead">List of Query </span>
+					class="lead">List of Query on "${active}"</span>
 					<img src="<c:url value="/static/images/cat.png" />" />
 			</div>
 			<table class="table table-hover">

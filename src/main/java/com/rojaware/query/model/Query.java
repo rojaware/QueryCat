@@ -7,8 +7,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.google.gson.Gson;
 
 public class Query implements Serializable {
@@ -16,6 +14,7 @@ public class Query implements Serializable {
 	private String name;
 	private String sql;
 	private Map<String, Object> map;
+	private String db;
 
 	public Query() {
 		super();
@@ -92,9 +91,17 @@ public class Query implements Serializable {
 		}
 	}
 
+	public String getDb() {
+		return db;
+	}
+
+	public void setDb(String db) {
+		this.db = db;
+	}
+
 	@Override
 	public String toString() {
-		return "Query [id=" + id + ", name=" + name + ", sql=" + sql + ", map=" + map + "]";
+		return "Query [id=" + id + ", \nname=" + name + ", \nsql=" + sql + ", \nmap=" + map + ", \ndb=" + db + "]";
 	}
 
 }

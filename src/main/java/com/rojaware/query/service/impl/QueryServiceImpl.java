@@ -6,11 +6,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.rojaware.query.dao.QueryDao;
-import com.rojaware.query.dao.impl.DBContextHolder;
 import com.rojaware.query.exception.QueryException;
 import com.rojaware.query.model.Query;
 import com.rojaware.query.model.TableView;
@@ -19,14 +17,13 @@ import com.rojaware.query.service.QueryService;
 @Service ("queryService")
 public class QueryServiceImpl implements QueryService {
 	final static Logger LOG = Logger.getLogger(QueryServiceImpl.class);
-	@Autowired
-	private ApplicationContext appContext;
+	
 	@Autowired
 	QueryDao dao;
 
 	@Override
-	public Query findById(int id) {
-		return dao.findById(id);
+	public Query findById(int id, String db) {
+		return dao.findById(id, db);
 	}
 
 	@Override
@@ -41,7 +38,7 @@ public class QueryServiceImpl implements QueryService {
      */
 	@Override
 	public void updateQuery(Query query) {
-		Query entity = dao.findById(query.getId());
+		Query entity = dao.findById(query.getId(), query.getDb());
         if(entity!=null){
             dao.save(query);
         } else {
@@ -50,18 +47,23 @@ public class QueryServiceImpl implements QueryService {
 	}
 
 	@Override
-	public void deleteQueryById(int id) {
-		dao.deleteById(id);
+	public void deleteQueryById(int id, String db) {
+		dao.deleteById(id, db);
+	}
+	public List<Query> list(String db){
+		 return dao.list(db);
+	 }
+	@Override
+	public List<Query> findAllQuerys(String db) {
+		return dao.list(db);
 	}
 
 	@Override
-	public List<Query> findAllQuerys() {
-		return dao.list();
-	}
-
-	@Override
-	public boolean isQueryUnique( Integer id, String name) {
-		 Query query = this.findById(id);
+	public boolean isQueryUnique( Query searchQuery) {
+		Integer id = searchQuery.getId();
+		String name = searchQuery.getName();
+		String db = searchQuery.getDb();
+		 Query query = this.findById(id, db);
 	     return ( query == null || ((id != null) && (query.getSql().equalsIgnoreCase(name))));
 	}
 
@@ -95,8 +97,14 @@ public class QueryServiceImpl implements QueryService {
 	public void changeDataSource(String db) {
 		
 		LOG.debug("change database into :: " +db);
-		DBContextHolder.setCatelog(db);
+		dao.changeEnv(db);
 		
+	}
+
+	@Override
+	public String getActiveDataSource() {
+		
+		return dao.getActiveEnv();
 	}
 	
 }
