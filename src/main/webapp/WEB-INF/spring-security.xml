@@ -1,0 +1,31 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">
+
+	<http pattern="/rest/**" 
+	      auto-config="false">
+		<intercept-url pattern="/rest/"
+			access="hasRole('USER') or hasRole('ADMIN') or hasRole('DBA')" />
+		<intercept-url pattern="/rest/list"
+			access="hasRole('USER') or hasRole('ADMIN') or hasRole('DBA')" />
+		<form-login login-page="/rest/login" 
+			default-target-url="/rest/list" 
+			username-parameter="ssoId"
+			login-processing-url="/rest/login" password-parameter="password"
+			authentication-failure-url="/rest/Access_Denied" />
+		<!-- enable csrf protection -->
+		<csrf />
+	</http>
+
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				<user name="bill" password="abc123" authorities="ROLE_USER" />
+				<user name="admin" password="root123" authorities="ROLE_ADMIN" />
+				<user name="dba" password="root123" authorities="ROLE_ADMIN,ROLE_DBA" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+
+</beans:beans>

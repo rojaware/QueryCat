@@ -48,19 +48,19 @@ public class TestQueryService
     @Test
     public void execute(){
     	Query query = new Query();
-    	query.setId(1001);
-    	Map<String, Object> map = new HashMap<String, Object>();
-    	map.put("PRODUCT", "SAVING");
-    	query.setMap(map);
-    	TableView view=null;
-		try {
-			view = service.execute(query);
-		} catch (QueryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//    	query.setId(1001);
+//    	Map<String, Object> map = new HashMap<String, Object>();
+//    	map.put("PRODUCT", "SAVING");
+//    	query.setMap(map);
+//    	TableView view=null;
+//		try {
+//			view = service.execute(query);
+//		} catch (QueryException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
     	
-    	LOG.debug(":: "+ view);
+//    	LOG.debug(":: "+ view);
     }
 //	public String runToJson(Query query);
 //

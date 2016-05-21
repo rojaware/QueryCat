@@ -17,8 +17,12 @@ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 		<property name="driverClassName" value="${jdbc.driverClassName.dev}" />
 
 	</bean>
+	<bean id="parentOracleDataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		abstract="true">
+		<property name="driverClassName" value="${jdbc.driverClassName.oracle}" />
+	</bean>
 	<bean id="devDataSource" parent="parentDataSource">
-
 		<property name="url" value="${jdbc.url.dev}" />
 		<property name="username" value="${jdbc.username.dev}" />
 		<property name="password" value="${jdbc.password.dev}" />
@@ -28,11 +32,38 @@ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 		<property name="username" value="${jdbc.username.local}" />
 		<property name="password" value="${jdbc.password.local}" />
 	</bean>
+		<bean id="sitDataSource" parent="parentDataSource">
+
+		<property name="url" value="${jdbc.url.sit}" />
+		<property name="username" value="${jdbc.username.sit}" />
+		<property name="password" value="${jdbc.password.sit}" />
+	</bean>
+		<bean id="patDataSource" parent="parentDataSource">
+
+		<property name="url" value="${jdbc.url.pat}" />
+		<property name="username" value="${jdbc.username.pat}" />
+		<property name="password" value="${jdbc.password.pat}" />
+	</bean>
+		<bean id="prodDataSource" parent="parentDataSource">
+
+		<property name="url" value="${jdbc.url.prod}" />
+		<property name="username" value="${jdbc.username.prod}" />
+		<property name="password" value="${jdbc.password.prod}" />
+	</bean>
+	<bean id="gtPortalDevDataSource" parent="parentOracleDataSource">
+		<property name="url" value="${jdbc.url.gt.dev.portal}" />
+		<property name="username" value="${jdbc.username.gt.dev.portal}" />
+		<property name="password" value="${jdbc.password.gt.dev.portal}" />
+	</bean>
 	<bean id="dataSource" class="com.rojaware.query.dao.impl.MyRoutingDataSource">
 		<property name="targetDataSources">
 			<map key-type="java.lang.String">
 				<entry key="petr_dev" value-ref="devDataSource" />
 				<entry key="company" value-ref="localDataSource" />
+				<entry key="petr_sit" value-ref="sitDataSource" />
+				<entry key="petr_pat" value-ref="patDataSource" />
+				<entry key="petr_prod" value-ref="prodDataSource" />
+				<entry key="gdtportaldev" value-ref="gtPortalDevDataSource" />
 			</map>
 		</property>
 		<property name="defaultTargetDataSource" ref="localDataSource" />
